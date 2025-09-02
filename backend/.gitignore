@@ -1,0 +1,53 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+
+# Environment variables / secrets
+.env
+.env.*
+*.env
+
+# Packaging
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# Logs
+logs/
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# pytest / coverage
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+
+# mypy / type checking
+.mypy_cache/
+.dmypy.json
+
+# cache
+.cache/
+
+# SQLite or local DBs
+*.db
+*.sqlite
+*.sqlite3
+
+# Docker
+.dockerignore
