@@ -1,0 +1,55 @@
+[project]
+name = "autofi-ai"
+version = "0.1.0"
+requires-python = ">=3.13"
+dependencies = [
+    "fastapi==0.115.12",
+    "uvicorn==0.27.1",
+    "python-dotenv>=1.0.1",
+    "pydantic==2.11.3",
+    "aiohttp>=3.12.14",
+    "black==24.3.0",
+    "flake8==7.0.0",
+    "openai==1.101.0",
+    "python-multipart==0.0.20",
+    "websockets>=13.1",
+    "numpy==2.2.4",
+    "requests==2.32.4",
+    "amazon-transcribe==0.6.2",
+    "mcp[cli]==1.6.0",
+    "uv==0.8.6",
+    "openai-agents>=0.0.12",
+    "jsonref>=1.1.0",
+    "fastmcp==2.2.6",
+    "pip-audit>=2.9.0",
+    "langdetect>=1.0.9",
+    "pymilvus>=2.5.10",
+    "elasticsearch>=8.0.0,<9.0.0",
+    "pymongo>=4.13.2",
+    "google-genai>=1.31.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest==8.2",
+    "pytest-html==4.1.1",
+    "pytest-asyncio==0.26.0"
+]
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+packages = {find = {where = ["src"]}}
+
+[tool.black]
+line-length = 88
+target-version = ['py310']
+include = '\.pyi?$'
+extend-exclude = '''
+# A regex preceded with ^/ will apply only to files and directories
+# in the root of the project.
+^/docs/
+''' 

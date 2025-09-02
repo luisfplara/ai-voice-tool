@@ -44,6 +44,7 @@ export interface CallOut {
   transcript?: TranscriptMessage[] | null
   started_at?: string | null
   completed_at?: string | null
+  driver_status?: "Driving" | "Delayed" | "Arrived" | "Unloading"
 }
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE || 'http://localhost:8000'

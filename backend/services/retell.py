@@ -21,8 +21,6 @@ class RetellService:
                 "You're a agent that works for a logistc company, your are responsible to get information about the freight. You're talking direclty with the driver. \n\n"
                 "If in the middle of the call, you think that the driver is having a emergency, you need to start the emergency workflow. \n\n"
                 "Be straight forward, do not reapeat yourself. \n\n"
-                "load_id = 7891-B\n"
-                "driver_name = Mike"
             ),
             "nodes": [
                 {
@@ -437,13 +435,19 @@ class RetellService:
     ) -> Dict[str, Any]:
         headers = {"Authorization": f"Bearer {self.api_key}", "Content-Type": "application/json"}
         endpoint = f"{self.base_url}/create-agent"
+
+        webhook_url = f"https://parrot-keen-fairly.ngrok-free.app/api/webhook/retell"
+
+
         if not conversation_flow_id:
             raise RuntimeError("conversation_flow_id is required to create an agent with conversation-flow response engine")
         payload: Dict[str, Any] = {
             "response_engine": {
                 "type": "conversation-flow",
                 "conversation_flow_id": conversation_flow_id,
-            }
+                
+            },
+            "webhook_url": webhook_url,
         }
         if agent_name:
             payload["agent_name"] = agent_name
@@ -491,8 +495,7 @@ class RetellService:
         metadata: Dict[str, Any],
     ) -> str:
         # Webhook URL for Retell to send events
-        webhook_url = f"{settings.backend_base_url}/api/webhook/retell"
-
+   
 
         # Retell Call (V2) create phone call requires from_number and to_number
         payload = {
@@ -516,5 +519,21 @@ class RetellService:
         # Expect the response to include a call id
         return {"call_id": data.get("call_id"), "access_token": data.get("access_token")}
 
-    
+    def get_call(self, call_id: str) -> Dict[str, Any]:
+        """Retrieve call details from Retell v2 Get Call.
+
+        Docs: https://docs.retellai.com/api-references/get-call
+        """
+        headers = {"Authorization": f"Bearer {self.api_key}"}
+        endpoint = f"{self.base_url}/v2/get-call/{call_id}"
+        try:
+            resp = httpx.get(endpoint, headers=headers, timeout=30)
+            resp.raise_for_status()
+        except httpx.HTTPStatusError as http_err:
+            detail = http_err.response.text if http_err.response is not None else str(http_err)
+            raise RuntimeError(f"Retell API error (get_call): {detail}")
+        except Exception as exc:
+            raise RuntimeError(f"Retell API error (get_call): {exc}")
+        return resp.json() or {}
+
 

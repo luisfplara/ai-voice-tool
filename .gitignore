@@ -14,8 +14,7 @@ lerna-debug.log*
 
 # Environment files (never commit secrets)
 .env
-.env.*
-*.env.local
+
 
 # Coverage / reports
 coverage/

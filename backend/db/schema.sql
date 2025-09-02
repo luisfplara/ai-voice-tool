@@ -16,6 +16,7 @@ create table if not exists public.calls (
   status text not null default 'queued',
   retell_call_id text,
   summary jsonb,
+  driver_status text default 'Driving',
   retell_call_access_token text,
   transcript jsonb,
   started_at timestamp with time zone default now(),

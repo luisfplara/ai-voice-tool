@@ -5,6 +5,7 @@ import {
   Button,
   Card,
   CardContent,
+  Chip,
   Container,
   FormControl,
   Grid,
@@ -157,10 +158,10 @@ export default function Calls() {
 
       <Stack spacing={2}>
         {calls.map((call) => (
-          <Card key={call.id} variant="outlined">
+          <Card key={call.id} variant="outlined" >
             <CardContent>
               <Grid container alignItems="center">
-                <Grid size={{ xs: 12, md: 3 }}>
+                <Grid size={{ xs: 12, md: 6 }}>
                   <Typography variant="subtitle1">
                     {call.driver_name} — Load {call.load_number}
                   </Typography>
@@ -170,8 +171,8 @@ export default function Calls() {
                       new Date(call.started_at).toLocaleString()}
                   </Typography>
                 </Grid>
-                <Grid size={{ xs: 12, md: 3 }}>
-                  <Stack direction="row" spacing={1}>
+                <Grid size={{ xs: 12, md: 6 }}>
+                  <Stack direction="row" justifyContent="flex-end" spacing={1}>
                     <Button
                       component={Link}
                       href={`/calls/${call.id}`}
@@ -185,6 +186,7 @@ export default function Calls() {
                       setDialogTitle(`${latest.driver_name} — Load ${latest.load_number}`);
                       setDialogOpen(true);
                     }}>Web Call</Button>
+                     <ChipStatus status={call.driver_status || "Driving"} />
                   </Stack>
                 </Grid>
               </Grid>
@@ -197,3 +199,7 @@ export default function Calls() {
     </Container>
   );
 }
+
+const ChipStatus = ({ status }: { status: "Driving" | "Delayed" | "Arrived" | "Unloading" }) => {
+  return <Chip label={status} color={status === "Driving" ? "info" : status === "Delayed" ? "warning" : status === "Arrived" ? "primary" : "error"} />;
+};

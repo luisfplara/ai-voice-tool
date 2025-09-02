@@ -16,7 +16,8 @@ export class PcmPlayer {
 
     const ctx = this.audioContext
     const buffer = ctx.createBuffer(1, samples.length, ctx.sampleRate)
-    buffer.copyToChannel(samples, 0)
+    const channelData = buffer.getChannelData(0)
+    channelData.set(samples)
 
     const source = ctx.createBufferSource()
     source.buffer = buffer

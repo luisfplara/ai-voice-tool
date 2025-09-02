@@ -53,7 +53,7 @@ export default function CallDetail() {
                 <Typography variant="body2" color="text.secondary">Load {call.load_number}</Typography>
               </Grid>
               <Grid size={{ xs: 12, md: 6 }}>
-                <Typography>Status: <strong>{call.status}</strong></Typography>
+                <Typography>Phone call status: <strong>{call.status}</strong></Typography>
                 <Typography>Started: {call.started_at && new Date(call.started_at).toLocaleString()}</Typography>
                 <Typography>Completed: {call.completed_at && new Date(call.completed_at).toLocaleString()}</Typography>
               </Grid>
@@ -75,7 +75,7 @@ export default function CallDetail() {
                     {Object.entries(call.summary).map(([k, v]) => (
                       <TableRow key={k}>
                         <TableCell sx={{ width: 240 }}>{k}</TableCell>
-                        <TableCell>{String(v)}</TableCell>
+                        <TableCell>{typeof v === "object" ? JSON.stringify(v) : String(v)}</TableCell>
                       </TableRow>
                     ))}
                   </TableBody>

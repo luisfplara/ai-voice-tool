@@ -53,7 +53,7 @@ class CallOut(BaseModel):
     driver_name: str
     load_number: str
     agent_config_id: str
-    status: Literal["queued", "in_progress", "completed", "failed"]
+    status: Literal["queued", "in_progress", "completed", "failed", "not_joined", "error"]
     retell_call_id: Optional[str] = None
     summary: Optional[Dict[str, Any]] = None
     transcript: Optional[List[Dict[str, Any]]] = None
@@ -61,4 +61,5 @@ class CallOut(BaseModel):
     completed_at: Optional[str] = None
     retell_call_id: str
     retell_call_access_token: str
+    driver_status: Optional[Literal["Driving", "Delayed", "Arrived", "Unloading"]] = None
 
