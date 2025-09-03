@@ -40,11 +40,6 @@ uvicorn main:app --reload --host 0.0.0.0 --port 8000
 
 3) Initialize database tables: Open `backend/db/schema.sql` in Supabase SQL editor and run it.
 
-4) Configure Retell webhook to POST to:
-```
-{BACKEND_BASE_URL}/api/webhook/retell
-```
-
 ### Frontend Setup (Next.js + MUI)
 1) With you using the backend in a diferent port than 8000, create `ai-voice-tool-test/.env` with:
 ```
@@ -108,4 +103,5 @@ ngrok http --url=YOU_NGROK_DOMAIN 8000
   - Frontend: Next.js App Router + MUI 7.
   - Backend: FastAPI, `httpx`, Supabase Python client.
   - Voice/Agent Platform: Retell AI (agents, conversation flows, calls, webhooks).
+
 
