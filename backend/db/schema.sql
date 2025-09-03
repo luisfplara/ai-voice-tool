@@ -10,7 +10,6 @@ create table if not exists public.agent_configs (
 create table if not exists public.calls (
   id uuid primary key,
   driver_name text not null,
-  phone_number text not null,
   load_number text not null,
   agent_config_id uuid references public.agent_configs(id) on delete set null,
   status text not null default 'queued',

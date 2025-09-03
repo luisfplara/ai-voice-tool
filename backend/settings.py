@@ -15,9 +15,5 @@ class Settings(BaseSettings):
     # Optional integrations
     openai_api_key: Optional[str] 
 
-    # Optional: E.164 caller ID from your Retell outbound config (if required)
-    outbound_caller_id: Optional[str] = None
-
-
 settings = Settings()
 

@@ -28,7 +28,7 @@ class RetellService:
                         "type": "prompt",
                         "text": "Hi {{driver_name}}, this is Dispatch with a check call on {{load_id}}. Can you give me an update on your status?",
                     },
-                    "name": "Get driver load status",
+                    "name": "Initial conversation",
                     "edges": [
                         {
                             "destination_node_id": "node-1756493598335",
@@ -259,7 +259,7 @@ class RetellService:
                     "display_position": {"x": -39.28033660955535, "y": 807.3522707881312},
                 },
                 {
-                    "name": "Conversation",
+                    "name": "Conversation current location and eta",
                     "edges": [
                         {
                             "destination_node_id": "node-1756494089139",
@@ -273,7 +273,7 @@ class RetellService:
                     "instruction": {"type": "prompt", "text": "Ask for driver his current location and eta"},
                 },
                 {
-                    "name": "Conversation",
+                    "name": "Conversation delay reason",
                     "edges": [
                         {
                             "destination_node_id": "node-1756494231971",
@@ -287,7 +287,7 @@ class RetellService:
                     "instruction": {"type": "prompt", "text": "Ask for the driver the delay reason"},
                 },
                 {
-                    "name": "Conversation",
+                    "name": "Conversation unloading",
                     "edges": [
                         {
                             "destination_node_id": "node-1756494294446",
@@ -327,7 +327,7 @@ class RetellService:
                 },
                 {
                     "instruction": {"type": "prompt", "text": "Thanks the driver and end the call"},
-                    "name": "Conversation",
+                    "name": "End call",
                     "edges": [
                         {
                             "id": "edge-1756752580723",
@@ -351,7 +351,7 @@ class RetellService:
                         "type": "prompt",
                         "text": "says that the company is aware of the acedent and is taking providence ASAP.",
                     },
-                    "name": "Conversation",
+                    "name": "End emergency",
                     "edges": [
                         {
                             "id": "edge-1756753123784",
@@ -436,7 +436,7 @@ class RetellService:
         headers = {"Authorization": f"Bearer {self.api_key}", "Content-Type": "application/json"}
         endpoint = f"{self.base_url}/create-agent"
 
-        webhook_url = f"https://parrot-keen-fairly.ngrok-free.app/api/webhook/retell"
+        webhook_url = f"{settings.backend_base_url}/api/webhook/retell"
 
 
         if not conversation_flow_id:

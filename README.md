@@ -15,9 +15,7 @@ SUPABASE_URL=...
 SUPABASE_SERVICE_ROLE_KEY=...
 RETELL_API_KEY=...
 BACKEND_BASE_URL=http://localhost:8000
-# Optional
 OPENAI_API_KEY=
-OUTBOUND_CALLER_ID=
 ```
 
 2) Install and run API
@@ -28,7 +26,7 @@ cd backend
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
 pip install -r requirements.txt
-uvicorn backend.main:app --reload --host 0.0.0.0 --port 8000
+uvicorn main:app --reload --host 0.0.0.0 --port 8000
 ```
 
 - Linux (Ubuntu):
@@ -37,7 +35,7 @@ cd backend
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
-uvicorn backend.main:app --reload --host 0.0.0.0 --port 8000
+uvicorn main:app --reload --host 0.0.0.0 --port 8000
 ```
 
 3) Initialize database tables: Open `backend/db/schema.sql` in Supabase SQL editor and run it.
@@ -48,7 +46,7 @@ uvicorn backend.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
 ### Frontend Setup (Next.js + MUI)
-1) Create `ai-voice-tool-test/.env.local`:
+1) With you using the backend in a diferent port than 8000, create `ai-voice-tool-test/.env` with:
 ```
 NEXT_PUBLIC_API_BASE=http://localhost:8000
 ```
@@ -69,64 +67,45 @@ pnpm install --frozen-lockfile
 pnpm dev
 ```
 
+###Setup Ngrok
+```
+ngrok http --url=YOU_NGROK_DOMAIN 8000
+```
+- For local webhook testing, expose the backend with a tunnel (e.g., `ngrok http 8000`) and set backen .env `BACKEND_BASE_URL` accordingly.
+
 ### What’s Implemented
-- Agent Configs UI: create, edit, delete; advanced voice settings (backchanneling, filler words, interruption sensitivity, speaking rate), emergency triggers.
-- Calls Dashboard: start test call with driver name, phone number, load number; recent calls list.
-- Call Detail: status, structured summary, full transcript, refresh summary.
-- Backend: FastAPI with Supabase persistence, Retell outbound call trigger and webhook, robust post-processing for both Dispatch check-in and Emergency escalation scenarios.
+- Agent Configs UI
+  - Basics: `agent_name`, `voice_id`, `voice_speed`, `voice_temperature`, `enable_backchannel`.
+  - Audio & Transcription: `language`, `stt_mode` (fast|accurate), `vocab_specialization`, `denoising_mode`, `volume`, `ambient_sound`, `ambient_sound_volume`, `interruption_sensitivity`, `responsiveness`.
+  - Recognition & Redaction: `boosted_keywords` (comma separated), `pronunciation_dictionary` (JSON array), `pii_config` (JSON object).
+  - Reminders & Backchanneling: `backchannel_frequency`, `reminder_trigger_ms`, `reminder_max_count`.
+  - Advanced JSON patch: free-form JSON merged into the agent update body for full coverage of Retell fields.
+  - Tooltips: every parameter has a short description inline for quick reference.
 
-### Notes
-- For local webhook testing, expose the backend with a tunnel (e.g., `ngrok http 8000`) and set `BACKEND_BASE_URL` accordingly.
-- The Retell outbound payload includes voice realism controls (backchanneling, fillers, interruption sensitivity) to satisfy Task A.
+- Conversation Flow Editor (for conversation-flow agents)
+  - Loads agent `response_engine.conversation_flow_id` and fetches flow via backend proxy.
+  - Editable fields: `global_prompt` and all nodes where `type === "conversation"` (node `name` and instruction `text`).
+  - Non-conversation nodes (e.g., variable extraction) are visible but not editable to keep logic consistent.
+  - Saves propagate to Retell via backend `PUT /api/configs/flows/{conversation_flow_id}`.
 
-### Production Deployment (Ubuntu)
+- Calls Dashboard
+  - Start test web calls with driver name, phone number, and load number; see recent calls.
+  - Join the live web call with web socket.
+  - Call detail: live status, transcript, structured summary
 
-Backend (systemd):
-```
-sudo adduser --system --group voiceapp
-sudo mkdir -p /opt/voiceapp/backend
-sudo chown -R voiceapp:voiceapp /opt/voiceapp
+- Backend (FastAPI)
+  - Configs API: create/list/get/update agents. Create auto-creates a default Conversation Flow and links it to the agent.
+  - Flow API: proxy endpoints to get and update Conversation Flows (Retell).
+  - Webhook: processes Retell `call_analyzed` events, merges transcript, collected variables, driver status, and cost/latency metadata; persists to Supabase.
+  - Outbound calls: initiates Retell web calls with driver/load dynamic variables and stores returned call id and access token.
+  - Default Flow: seeded with a logistics check-in workflow (current location/ETA, delay reason, unloading, and emergency path), matching the current ops needs.
 
-cd /opt/voiceapp/backend
-python3 -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
+- Data Model (Supabase)
+  - `agent_configs`: minimal registry for agents created via the app (id, agent_id, agent_name).
+  - `calls`: records each test call, status transitions, transcript, summary, and Retell identifiers.
 
-# Create /opt/voiceapp/backend/.env with your secrets
-
-cat <<'SERVICE' | sudo tee /etc/systemd/system/voiceapp-backend.service
-[Unit]
-Description=Voice App Backend (FastAPI)
-After=network.target
-
-[Service]
-User=voiceapp
-WorkingDirectory=/opt/voiceapp/backend
-EnvironmentFile=/opt/voiceapp/backend/.env
-ExecStart=/opt/voiceapp/backend/.venv/bin/uvicorn backend.main:app --host 0.0.0.0 --port 8000
-Restart=always
-
-[Install]
-WantedBy=multi-user.target
-SERVICE
-
-sudo systemctl daemon-reload
-sudo systemctl enable --now voiceapp-backend
-```
-
-Frontend (Next.js build + reverse proxy):
-```
-sudo mkdir -p /opt/voiceapp/frontend
-sudo chown -R voiceapp:voiceapp /opt/voiceapp
-
-cd /opt/voiceapp/frontend
-pnpm install --frozen-lockfile
-pnpm build
-pnpm start -- -p 3000
-```
-
-Recommended: run the frontend with a process manager (pm2/systemd) and place Nginx in front with TLS.
-
-### Backend .gitignore (already added)
-See `backend/.gitignore` for Python, venv, env, cache, and log ignores suitable for Ubuntu.
+- Tech Stack
+  - Frontend: Next.js App Router + MUI 7.
+  - Backend: FastAPI, `httpx`, Supabase Python client.
+  - Voice/Agent Platform: Retell AI (agents, conversation flows, calls, webhooks).
 

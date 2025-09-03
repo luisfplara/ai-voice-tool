@@ -53,6 +53,7 @@ def start_call(req: CallStartRequest):
         "driver_name": req.driver_name,
         "load_number": req.load_number,
         "agent_config_id": req.agent_config_id,
+        "driver_status": "Not Joined",
         "status": "queued",
         "started_at": now,
     }
@@ -66,8 +67,8 @@ def start_call(req: CallStartRequest):
             load_number=req.load_number,
             metadata={"call_id": call_id},
         )
-        sb.table(CALLS_TABLE).update({"status": "in_progress", "retell_call_id": outbound_call.get("call_id"), "retell_call_access_token": outbound_call.get("access_token")}).eq("id", call_id).execute()
-        row.update({"status": "in_progress", "retell_call_id": outbound_call.get("call_id"), "retell_call_access_token": outbound_call.get("access_token")})
+        sb.table(CALLS_TABLE).update({"status": "not_joined", "retell_call_id": outbound_call.get("call_id"), "retell_call_access_token": outbound_call.get("access_token")}).eq("id", call_id).execute()
+        row.update({"status": "not_joined", "retell_call_id": outbound_call.get("call_id"), "retell_call_access_token": outbound_call.get("access_token")})
     except Exception as e:
         sb.table(CALLS_TABLE).update({"status": "failed"}).eq("id", call_id).execute()
         raise HTTPException(status_code=500, detail=f"Failed to start call: {e}")

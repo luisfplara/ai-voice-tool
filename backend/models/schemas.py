@@ -61,5 +61,5 @@ class CallOut(BaseModel):
     completed_at: Optional[str] = None
     retell_call_id: str
     retell_call_access_token: str
-    driver_status: Optional[Literal["Driving", "Delayed", "Arrived", "Unloading"]] = None
+    driver_status: Optional[Literal["Driving", "Delayed", "Arrived", "Unloading", "Not Joined", "Emergency"]] = None
 

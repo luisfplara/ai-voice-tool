@@ -61,7 +61,7 @@ export default function CallDetail() {
 
             <Stack direction="row" spacing={2} sx={{ mt: 2 }}>
               <Button variant="outlined" onClick={load}>Reload</Button>
-              <Button variant="contained" disabled={refreshing} onClick={doRefresh}>Refresh Summary</Button>
+              {/*<Button variant="contained" disabled={refreshing} onClick={doRefresh}>Refresh Summary</Button>*/}
             </Stack>
 
             <Divider sx={{ my: 2 }} />

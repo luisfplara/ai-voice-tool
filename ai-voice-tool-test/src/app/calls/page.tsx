@@ -158,7 +158,7 @@ export default function Calls() {
 
       <Stack spacing={2}>
         {calls.map((call) => (
-          <Card key={call.id} variant="outlined" >
+          <Card key={call.id} variant="outlined">
             <CardContent>
               <Grid container alignItems="center">
                 <Grid size={{ xs: 12, md: 6 }}>
@@ -180,13 +180,25 @@ export default function Calls() {
                     >
                       Open
                     </Button>
-                    <Button color="primary" variant="contained" onClick={async () => {
-                      const latest = await getCall(call.id);
-                      setDialogToken(latest.retell_call_access_token || null);
-                      setDialogTitle(`${latest.driver_name} — Load ${latest.load_number}`);
-                      setDialogOpen(true);
-                    }}>Web Call</Button>
-                     <ChipStatus status={call.driver_status || "Driving"} />
+                    {call.driver_status === "Not Joined" && call.status === "not_joined" && (
+                      <Button
+                        color="primary"
+                        variant="contained"
+                        onClick={async () => {
+                          const latest = await getCall(call.id);
+                          setDialogToken(
+                            latest.retell_call_access_token || null
+                          );
+                          setDialogTitle(
+                            `${latest.driver_name} — Load ${latest.load_number}`
+                          );
+                          setDialogOpen(true);
+                        }}
+                      >
+                        Web Call
+                      </Button>
+                    )}
+                    <ChipStatus status={call.driver_status || "Driving"} />
                   </Stack>
                 </Grid>
               </Grid>
@@ -195,11 +207,37 @@ export default function Calls() {
         ))}
       </Stack>
 
-      <WebCallDialog open={dialogOpen} onClose={() => setDialogOpen(false)} accessToken={dialogToken} title={dialogTitle} />
+      <WebCallDialog
+        open={dialogOpen}
+        onClose={() => setDialogOpen(false)}
+        accessToken={dialogToken}
+        title={dialogTitle}
+      />
     </Container>
   );
 }
 
-const ChipStatus = ({ status }: { status: "Driving" | "Delayed" | "Arrived" | "Unloading" }) => {
-  return <Chip label={status} color={status === "Driving" ? "info" : status === "Delayed" ? "warning" : status === "Arrived" ? "primary" : "error"} />;
+const ChipStatus = ({
+  status,
+}: {
+  status: "Driving" | "Delayed" | "Arrived" | "Unloading" | "Not Joined" | "Emergency";
+}) => {
+  return (
+    <Chip
+      label={status}
+      color={
+        status === "Driving"
+          ? "info"
+          : status === "Delayed"
+          ? "warning"
+          : status === "Arrived"
+          ? "success"
+          : status === "Not Joined"
+          ? "default"
+          : status === "Unloading"
+          ? "success"
+          : "error"
+      }
+    />
+  );
 };

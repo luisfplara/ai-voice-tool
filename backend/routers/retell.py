@@ -96,9 +96,12 @@ async def retell_webhook(req: Request):
     }
         merged_summary = {**existing_summary, **{k: v for k, v in extra.items() if v is not None}}
         updates["summary"] = merged_summary
-        driver_status = call_data.get("collected_dynamic_variables" or {}).get("driver_status")
+        driver_status = (call_data.get("collected_dynamic_variables" ) or {}).get("driver_status")
+        emergency_type = (call_data.get("collected_dynamic_variables" ) or {}).get("emergency_type")
         if driver_status:
             updates["driver_status"] = driver_status
+        if emergency_type:
+            updates["driver_status"] = "Emergency"
         sb.table(CALLS_TABLE).update(updates).eq("id", cur.data["id"]).execute()
 
         # Optionally regenerate our structured summary using latest transcript
