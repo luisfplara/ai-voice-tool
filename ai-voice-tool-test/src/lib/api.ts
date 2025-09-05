@@ -16,7 +16,7 @@ export type Summary = Record<string, unknown>
 
 export interface CallStartRequest {
   driver_name: string
-  phone_number: string
+  phone_number?: string
   load_number: string
   agent_config_id: string
 }

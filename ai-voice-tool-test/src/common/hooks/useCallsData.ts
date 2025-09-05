@@ -18,7 +18,6 @@ export function useCallsData() {
   const [error, setError] = useState<string | null>(null);
   const [form, setForm] = useState<CallFormState>({
     driver_name: "",
-    phone_number: "",
     load_number: "",
     agent_config_id: "",
   });

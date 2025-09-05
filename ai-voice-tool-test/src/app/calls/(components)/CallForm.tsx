@@ -28,7 +28,7 @@ export function CallForm({ form, agents, submitting, onChange, onSubmit, onReloa
           <TextField
             label="Phone Number"
             fullWidth
-            value={form.phone_number}
+            value={form.phone_number || ""}
             onChange={(e) => onChange({ ...form, phone_number: e.target.value })}
           />
         </Grid>

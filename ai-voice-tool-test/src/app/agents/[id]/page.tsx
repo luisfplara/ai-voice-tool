@@ -239,13 +239,13 @@ export default function AgentEdit() {
                   />
                 </Grid>
                 <Grid size={{ xs: 12, md: 6 }}>
-                  <FormControl fullWidth>
+                  <FormControl fullWidth required>
                     <InputLabel id="demo-simple-select-label">Voice ID</InputLabel>
                     <Select
                       labelId="demo-simple-select-label"
                       id="demo-simple-select"
-
-                      value={agent.voice_id || "11labs-Andrew"}
+                      defaultValue={"11labs-Andrew"}
+                      value={agent.voice_id}
                       label="Voice ID"
                       onChange={(e) => setField("voice_id", e.target.value)}
                     >

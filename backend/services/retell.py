@@ -487,13 +487,13 @@ class RetellService:
             raise RuntimeError(f"Retell API error (update_agent): {exc}")
         return resp.json() or {}
 
-    def start_outbound_call(
+    def start_web_call(
         self,
         agent_id: str,
         driver_name: str,
         load_number: str,
         metadata: Dict[str, Any],
-    ) -> str:
+    ) -> Dict[str, Any]:
         # Webhook URL for Retell to send events
    
 
@@ -516,7 +516,7 @@ class RetellService:
             raise RuntimeError(f"Retell API error: {exc}")
 
         data = resp.json()
-        # Expect the response to include a call id
+        # Expect the response to include a call id and access token
         return {"call_id": data.get("call_id"), "access_token": data.get("access_token")}
 
     def get_call(self, call_id: str) -> Dict[str, Any]:
