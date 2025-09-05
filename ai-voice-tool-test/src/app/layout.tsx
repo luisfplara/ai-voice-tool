@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import ThemeRegistry from "../components/ThemeRegistry";
+import ThemeRegistry from "../common/components/ThemeRegistry";
 import { AppRouterCacheProvider } from "@mui/material-nextjs/v14-appRouter";
-import AppTopBar from "../components/AppTopBar";
+import AppTopBar from "../common/components/AppTopBar";
 
 
 const geistSans = Geist({
