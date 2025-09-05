@@ -3,12 +3,13 @@ from typing import Any, Dict, List, Optional
 from services.retell import RetellService
 from db.supabase_client import get_supabase
 import uuid
+from models.schemas import AgentRecord, AgentCreateRequest, RetellAgentOut, ConversationFlowPayload
 
 
 router = APIRouter()
 
 
-@router.get("/", response_model=List[Dict[str, Any]])
+@router.get("/", response_model=List[AgentRecord])
 def list_agents():
     # Return only DB-registered agents with id, agent_id, agent_name
     sb = get_supabase()
@@ -16,7 +17,7 @@ def list_agents():
     return rows.data or []
 
 
-@router.get("/flows/{conversation_flow_id}", response_model=Dict[str, Any])
+@router.get("/flows/{conversation_flow_id}", response_model=ConversationFlowPayload)
 def get_conversation_flow(conversation_flow_id: str, version: Optional[int] = Query(default=None)):
     service = RetellService()
     try:
@@ -25,8 +26,8 @@ def get_conversation_flow(conversation_flow_id: str, version: Optional[int] = Qu
         raise HTTPException(status_code=404, detail=str(e))
 
 
-@router.put("/flows/{conversation_flow_id}", response_model=Dict[str, Any])
-def update_conversation_flow(conversation_flow_id: str, payload: Dict[str, Any], version: Optional[int] = Query(default=None)):
+@router.put("/flows/{conversation_flow_id}", response_model=ConversationFlowPayload)
+def update_conversation_flow(conversation_flow_id: str, payload: ConversationFlowPayload, version: Optional[int] = Query(default=None)):
     service = RetellService()
     try:
         return service.update_conversation_flow(conversation_flow_id, payload, version=version)
@@ -34,11 +35,11 @@ def update_conversation_flow(conversation_flow_id: str, payload: Dict[str, Any],
         raise HTTPException(status_code=400, detail=str(e))
 
 
-@router.post("/", response_model=Dict[str, Any])
-def create_agent(payload: Dict[str, Any]):
+@router.post("/", response_model=RetellAgentOut)
+def create_agent(payload: AgentCreateRequest):
     # Minimal accepted fields: agent_name, voice_id
-    agent_name: Optional[str] = payload.get("agent_name")
-    voice_id: Optional[str] = payload.get("voice_id")
+    agent_name: Optional[str] = payload.agent_name
+    voice_id: Optional[str] = payload.voice_id
     service = RetellService()
     try:
         # 1) Create conversation flow
@@ -64,10 +65,10 @@ def create_agent(payload: Dict[str, Any]):
         "agent_name": agent_name
     }
     sb.table("agent_configs").insert(row).execute()
-    return created
+    return created  # will be validated by RetellAgentOut model
 
 
-@router.get("/{agent_id}", response_model=Dict[str, Any])
+@router.get("/{agent_id}", response_model=RetellAgentOut)
 def get_agent(agent_id: str):
     service = RetellService()
     try:
@@ -76,8 +77,8 @@ def get_agent(agent_id: str):
         raise HTTPException(status_code=404, detail="Agent not found")
 
 
-@router.put("/{agent_id}", response_model=Dict[str, Any])
-def update_agent(agent_id: str, payload: Dict[str, Any]):
+@router.put("/{agent_id}", response_model=RetellAgentOut)
+def update_agent(agent_id: str, payload: ConversationFlowPayload):
     service = RetellService()
     try:
         return service.update_agent(agent_id, payload)

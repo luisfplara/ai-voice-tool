@@ -6,6 +6,7 @@ from services.retell import RetellService
 from services.postprocess import generate_structured_summary
 import uuid
 from datetime import datetime, timezone
+from pydantic import ValidationError
 
 
 router = APIRouter()
@@ -44,6 +45,7 @@ def start_call(req: CallStartRequest):
     try:
         agent = service.get_agent(cfg.data.get("agent_id"))
     except Exception:
+        # Avoid leaking upstream error details
         raise HTTPException(status_code=404, detail="Agent not found")
     print("agent->  ", agent)
     call_id = str(uuid.uuid4())
@@ -59,9 +61,9 @@ def start_call(req: CallStartRequest):
     }
     sb.table(CALLS_TABLE).insert(row).execute()
 
-    # Trigger Retell outbound call
+    # Trigger Retell web call
     try:
-        outbound_call = service.start_outbound_call(
+        outbound_call = service.start_web_call(
             agent_id=cfg.data.get("agent_id"),
             driver_name=req.driver_name,
             load_number=req.load_number,
@@ -69,9 +71,9 @@ def start_call(req: CallStartRequest):
         )
         sb.table(CALLS_TABLE).update({"status": "not_joined", "retell_call_id": outbound_call.get("call_id"), "retell_call_access_token": outbound_call.get("access_token")}).eq("id", call_id).execute()
         row.update({"status": "not_joined", "retell_call_id": outbound_call.get("call_id"), "retell_call_access_token": outbound_call.get("access_token")})
-    except Exception as e:
+    except Exception:
         sb.table(CALLS_TABLE).update({"status": "failed"}).eq("id", call_id).execute()
-        raise HTTPException(status_code=500, detail=f"Failed to start call: {e}")
+        raise HTTPException(status_code=502, detail="Failed to start call")
 
     return row
 
